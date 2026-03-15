@@ -74,8 +74,6 @@ export class WebGLRenderer {
   }
 
   private initPrograms(): void {
-    const gl = this.gl
-
     const geometryUniforms = ['u_texture', 'u_cropRect', 'u_rotation', 'u_flip']
     this.geometryProgram = this.buildProgram(GEOMETRY_VERT, GEOMETRY_FRAG, geometryUniforms)
 

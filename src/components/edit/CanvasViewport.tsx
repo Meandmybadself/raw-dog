@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useState, useMemo } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import { WebGLRenderer } from '../../renderer/WebGLRenderer'
 import { useEditStore } from '../../stores/editStore'
 import { useFileStore } from '../../stores/fileStore'

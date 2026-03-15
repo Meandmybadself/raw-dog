@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { WebGLRenderer, HistogramData } from '../../renderer/WebGLRenderer'
 import { useEditStore } from '../../stores/editStore'
 import { useUIStore } from '../../stores/uiStore'
