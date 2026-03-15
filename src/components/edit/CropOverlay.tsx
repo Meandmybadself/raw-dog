@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState } from 'react'
+import { useRef, useCallback, useState, useEffect } from 'react'
 import { useEditStore } from '../../stores/editStore'
 import { useUIStore } from '../../stores/uiStore'
 import type { CropRect } from '../../types'
@@ -16,10 +16,24 @@ function CropOverlayInner() {
   const crop = useEditStore((s) => s.params.crop)
   const setParam = useEditStore((s) => s.setParam)
   const commitSnapshot = useEditStore((s) => s.commitSnapshot)
+  const setActiveTool = useUIStore((s) => s.setActiveTool)
+  const setStraightenActive = useUIStore((s) => s.setStraightenActive)
   const overlayRef = useRef<HTMLDivElement>(null)
   const [activeHandle, setActiveHandle] = useState<Handle>(null)
   const startPos = useRef({ x: 0, y: 0 })
   const startCrop = useRef<CropRect>(crop)
+
+  // Enter key applies crop (switches to adjust mode)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        setStraightenActive(false)
+        setActiveTool('adjust')
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [setActiveTool, setStraightenActive])
 
   const handlePointerDown = useCallback((e: React.PointerEvent, handle: Handle) => {
     e.preventDefault()
