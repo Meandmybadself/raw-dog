@@ -42,4 +42,11 @@
   background: var(--color-bg-panel);
   border-left: 1px solid var(--color-border);
   overflow: hidden;
+  transition: opacity var(--transition-base);
+}
+
+.edit-view--processing .edit-view__topbar,
+.edit-view--processing .edit-view__sidebar {
+  opacity: 0.4;
+  pointer-events: none;
 }

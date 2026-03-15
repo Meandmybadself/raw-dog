@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { useFileStore } from '../../stores/fileStore'
+import { useUIStore } from '../../stores/uiStore'
 import type { WebGLRenderer } from '../../renderer/WebGLRenderer'
 import { CanvasViewport } from './CanvasViewport'
 import { AdjustmentPanel } from './AdjustmentPanel'
@@ -14,9 +15,10 @@ export function EditView() {
   const currentFileId = useFileStore((s) => s.currentFileId)
   const catalog = useFileStore((s) => s.catalog)
   const currentEntry = currentFileId ? catalog[currentFileId] : null
+  const isProcessing = useUIStore((s) => s.decodeProgress) !== null || useUIStore((s) => s.exportProgress) !== null
 
   return (
-    <div className="edit-view">
+    <div className={`edit-view ${isProcessing ? 'edit-view--processing' : ''}`}>
       <div className="edit-view__topbar">
         <span className="edit-view__filename">{currentEntry?.originalName ?? ''}</span>
         <ExportPanel rendererRef={rendererRef} />
