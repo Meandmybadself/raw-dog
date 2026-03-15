@@ -38,7 +38,7 @@ export function ExportPanel({ rendererRef }: ExportPanelProps) {
     try {
       setExportProgress({ phase: 'Rendering full resolution...', percent: 20 })
 
-      const pixels = rendererRef.current.exportFullRes(params)
+      const { pixels, width: exportW, height: exportH } = rendererRef.current.exportFullRes(params)
 
       setExportProgress({ phase: 'Encoding...', percent: 60 })
 
@@ -67,8 +67,8 @@ export function ExportPanel({ rendererRef }: ExportPanelProps) {
           type: 'ENCODE',
           id,
           pixels: transferBuffer,
-          width: currentEntry.width,
-          height: currentEntry.height,
+          width: exportW,
+          height: exportH,
           format,
           quality: quality / 100,
         }, [transferBuffer])

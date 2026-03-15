@@ -328,16 +328,19 @@ export class WebGLRenderer {
     return { r, g, b, luma }
   }
 
-  exportFullRes(params: EditParams): Float32Array {
+  exportFullRes(params: EditParams): { pixels: Float32Array; width: number; height: number } {
     const gl = this.gl
     if (!this.sourceTexture) throw new Error('No image loaded')
 
     const w = this.fullWidth
     const h = this.fullHeight
+    const qt = params.crop.quarterTurns ?? 0
+    const outW = qt % 2 === 1 ? h : w
+    const outH = qt % 2 === 1 ? w : h
 
-    // Allocate full-res FBOs temporarily
-    const geoFBO = createFramebuffer(gl, w, h)
-    const adjFBO = createFramebuffer(gl, w, h)
+    // Allocate full-res FBOs temporarily at output dimensions
+    const geoFBO = createFramebuffer(gl, outW, outH)
+    const adjFBO = createFramebuffer(gl, outW, outH)
 
     // Save current FBOs
     const prevGeo = this.geometryFBO
@@ -345,12 +348,12 @@ export class WebGLRenderer {
     this.geometryFBO = geoFBO
     this.adjustmentFBO = adjFBO
 
-    this.renderPipeline(this.sourceTexture, w, h, params)
+    this.renderPipeline(this.sourceTexture, outW, outH, params)
 
     // Readback
-    const pixels = new Float32Array(w * h * 4)
+    const pixels = new Float32Array(outW * outH * 4)
     gl.bindFramebuffer(gl.FRAMEBUFFER, adjFBO.fbo)
-    gl.readPixels(0, 0, w, h, gl.RGBA, gl.FLOAT, pixels)
+    gl.readPixels(0, 0, outW, outH, gl.RGBA, gl.FLOAT, pixels)
     gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 
     // Cleanup
@@ -364,19 +367,19 @@ export class WebGLRenderer {
     this.adjustmentFBO = prevAdj
 
     // Convert RGBA to RGB and flip vertically
-    const rgb = new Float32Array(w * h * 3)
-    for (let row = 0; row < h; row++) {
-      const srcRow = h - 1 - row
-      for (let col = 0; col < w; col++) {
-        const si = (srcRow * w + col) * 4
-        const di = (row * w + col) * 3
+    const rgb = new Float32Array(outW * outH * 3)
+    for (let row = 0; row < outH; row++) {
+      const srcRow = outH - 1 - row
+      for (let col = 0; col < outW; col++) {
+        const si = (srcRow * outW + col) * 4
+        const di = (row * outW + col) * 3
         rgb[di] = pixels[si]
         rgb[di + 1] = pixels[si + 1]
         rgb[di + 2] = pixels[si + 2]
       }
     }
 
-    return rgb
+    return { pixels: rgb, width: outW, height: outH }
   }
 
   getEffectiveDims(quarterTurns: number): { w: number; h: number } {
