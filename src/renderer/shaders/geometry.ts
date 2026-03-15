@@ -10,7 +10,6 @@ uniform vec4 u_cropRect;   // x, y, width, height in [0,1]
 uniform float u_rotation;  // fine rotation in radians
 uniform vec2 u_flip;       // x=flipH, y=flipV (0 or 1)
 uniform int u_quarterTurns; // 0-3: number of 90° CW rotations
-uniform vec2 u_srcAspect;  // x=srcW/srcH, y=srcH/srcW (for aspect correction)
 
 void main() {
   vec2 uv = vec2(a_uv.x, 1.0 - a_uv.y);
@@ -23,16 +22,6 @@ void main() {
   for (int i = 0; i < 4; i++) {
     if (i >= u_quarterTurns) break;
     uv = vec2(1.0 - uv.y, uv.x);
-  }
-
-  // When quarterTurns is odd, the source texture aspect differs from the output.
-  // After rotation, UV x maps to source height and UV y maps to source width.
-  // Scale UVs around center: x by srcH/srcW (.y), y by srcW/srcH (.x).
-  if (u_quarterTurns == 1 || u_quarterTurns == 3) {
-    uv = vec2(
-      0.5 + (uv.x - 0.5) * u_srcAspect.y,
-      0.5 + (uv.y - 0.5) * u_srcAspect.x
-    );
   }
 
   // Apply crop

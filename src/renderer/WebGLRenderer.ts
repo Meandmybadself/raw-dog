@@ -74,7 +74,7 @@ export class WebGLRenderer {
   }
 
   private initPrograms(): void {
-    const geometryUniforms = ['u_texture', 'u_cropRect', 'u_rotation', 'u_flip', 'u_quarterTurns', 'u_srcAspect']
+    const geometryUniforms = ['u_texture', 'u_cropRect', 'u_rotation', 'u_flip', 'u_quarterTurns']
     this.geometryProgram = this.buildProgram(GEOMETRY_VERT, GEOMETRY_FRAG, geometryUniforms)
 
     const adjustmentUniforms = [
@@ -251,12 +251,6 @@ export class WebGLRenderer {
     gl.uniform1i(
       this.geometryProgram.uniforms.get('u_quarterTurns')!,
       params.crop.quarterTurns ?? 0,
-    )
-    const aspect = this.fullWidth / this.fullHeight
-    gl.uniform2f(
-      this.geometryProgram.uniforms.get('u_srcAspect')!,
-      aspect,
-      1.0 / aspect,
     )
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 
