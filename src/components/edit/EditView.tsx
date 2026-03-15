@@ -29,7 +29,7 @@ export function EditView() {
         </div>
         <div className="edit-view__sidebar">
           <Histogram rendererRef={rendererRef} />
-          <AdjustmentPanel />
+          <AdjustmentPanel rendererRef={rendererRef} />
         </div>
       </div>
     </div>

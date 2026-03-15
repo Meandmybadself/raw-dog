@@ -2,7 +2,9 @@ import { useEditStore } from '../../stores/editStore'
 import { useUIStore } from '../../stores/uiStore'
 import { EXPOSURE_SLIDERS, COLOR_SLIDERS, WB_PRESETS } from '../../lib/constants'
 import { Slider } from '../common/Slider'
+import { FilmPanel } from './FilmPanel'
 import type { SliderConfig } from '../../types'
+import type { WebGLRenderer } from '../../renderer/WebGLRenderer'
 import './AdjustmentPanel.css'
 
 function SliderGroup({ sliders }: { sliders: SliderConfig[] }) {
@@ -47,7 +49,11 @@ function WhiteBalancePresets() {
   )
 }
 
-export function AdjustmentPanel() {
+interface AdjustmentPanelProps {
+  rendererRef: React.MutableRefObject<WebGLRenderer | null>
+}
+
+export function AdjustmentPanel({ rendererRef }: AdjustmentPanelProps) {
   const activeTool = useUIStore((s) => s.activeTool)
   const setActiveTool = useUIStore((s) => s.setActiveTool)
   const setStraightenActive = useUIStore((s) => s.setStraightenActive)
@@ -67,6 +73,12 @@ export function AdjustmentPanel() {
           onClick={() => setActiveTool('crop')}
         >
           Crop
+        </button>
+        <button
+          className={`tool-btn ${activeTool === 'film' ? 'tool-btn--active' : ''}`}
+          onClick={() => { setStraightenActive(false); setActiveTool('film') }}
+        >
+          Film
         </button>
       </div>
 
@@ -95,6 +107,10 @@ export function AdjustmentPanel() {
         <div className="adjustment-panel__crop">
           <CropControls />
         </div>
+      )}
+
+      {activeTool === 'film' && (
+        <FilmPanel rendererRef={rendererRef} />
       )}
     </aside>
   )
