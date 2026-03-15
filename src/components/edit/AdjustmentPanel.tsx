@@ -50,6 +50,7 @@ function WhiteBalancePresets() {
 export function AdjustmentPanel() {
   const activeTool = useUIStore((s) => s.activeTool)
   const setActiveTool = useUIStore((s) => s.setActiveTool)
+  const setStraightenActive = useUIStore((s) => s.setStraightenActive)
   const resetToDefaults = useEditStore((s) => s.resetToDefaults)
 
   return (
@@ -57,7 +58,7 @@ export function AdjustmentPanel() {
       <div className="adjustment-panel__tools">
         <button
           className={`tool-btn ${activeTool === 'adjust' ? 'tool-btn--active' : ''}`}
-          onClick={() => setActiveTool('adjust')}
+          onClick={() => { setStraightenActive(false); setActiveTool('adjust') }}
         >
           Adjust
         </button>
@@ -175,6 +176,7 @@ function CropControls() {
                 }
               }}
               onBlur={commitSnapshot}
+              onKeyDown={(e) => { if (e.key === 'Enter') { commitSnapshot(); (e.target as HTMLInputElement).blur() } }}
               aria-label="Rotation degrees"
             />
           </div>

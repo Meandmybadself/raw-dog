@@ -26,11 +26,12 @@ void main() {
   }
 
   // When quarterTurns is odd, the source texture aspect differs from the output.
-  // Scale UVs around center to correct aspect ratio.
+  // After rotation, UV x maps to source height and UV y maps to source width.
+  // Scale UVs around center: x by srcH/srcW (.y), y by srcW/srcH (.x).
   if (u_quarterTurns == 1 || u_quarterTurns == 3) {
     uv = vec2(
-      0.5 + (uv.x - 0.5) * u_srcAspect.x,
-      0.5 + (uv.y - 0.5) * u_srcAspect.y
+      0.5 + (uv.x - 0.5) * u_srcAspect.y,
+      0.5 + (uv.y - 0.5) * u_srcAspect.x
     );
   }
 

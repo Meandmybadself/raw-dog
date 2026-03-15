@@ -209,7 +209,10 @@ export class WebGLRenderer {
 
   private renderPreview(): void {
     if (!this.previewTexture || !this.currentParams) return
-    this.renderPipeline(this.previewTexture, this.previewWidth, this.previewHeight, this.currentParams)
+    const qt = this.currentParams.crop.quarterTurns ?? 0
+    const pw = qt % 2 === 1 ? this.previewHeight : this.previewWidth
+    const ph = qt % 2 === 1 ? this.previewWidth : this.previewHeight
+    this.renderPipeline(this.previewTexture, pw, ph, this.currentParams)
   }
 
   private renderPipeline(srcTex: WebGLTexture, w: number, h: number, params: EditParams): void {
