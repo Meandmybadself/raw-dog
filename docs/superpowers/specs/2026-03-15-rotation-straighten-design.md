@@ -21,7 +21,7 @@ interface CropRect {
 }
 ```
 
-Default: `quarterTurns: 0`. Backward-compatible — missing field in saved params treated as 0.
+Default: `quarterTurns: 0`. Backward-compatible — `editStore.loadParams()` must apply `params.crop.quarterTurns ?? 0` when loading saved params so that old saves without this field default correctly.
 
 ### UI State
 
@@ -46,7 +46,7 @@ Rotation
 ### Controls
 
 - **↶ / ↷ buttons**: Rotate 90° CCW / CW. Modifies `quarterTurns` (mod 4). Commits snapshot on click.
-- **Slider**: Range -45 to +45, step 0.1. Controls `angle` (fine rotation). Uses existing `Slider` component pattern.
+- **Slider**: Range -45 to +45, step 0.1. Controls `angle` (fine rotation). Note: the existing `Slider` component's `key` type is `keyof Omit<EditParams, 'crop'>`, so the rotation slider must use a raw `<input type="range">` (same approach as the existing crop angle slider in `AdjustmentPanel.tsx`) rather than the `Slider` component directly.
 - **Number input**: Editable field synced with slider, same range. Allows precise angle entry.
 - **Straighten button**: Toggles `straightenActive` in uiStore. Highlighted when active.
 
@@ -64,7 +64,8 @@ Rotation
 ### Angle Calculation
 
 ```
-lineAngle = atan2(dy, dx)  // in radians, convert to degrees
+// Screen space: Y-down. Negate dy to get standard math-space angle.
+lineAngle = atan2(-dy, dx)  // in radians, convert to degrees
 
 if |lineAngle| <= 45°:
     // Line is more horizontal → rotate to make it horizontal
@@ -96,7 +97,7 @@ uniform int u_quarterTurns; // 0-3
 In the geometry vertex shader:
 
 ```glsl
-float fineAngle = u_angle; // existing, radians
+float fineAngle = u_rotation; // existing uniform (named u_rotation in shader)
 float totalAngle = fineAngle + float(u_quarterTurns) * (3.14159265 / 2.0);
 ```
 
@@ -104,11 +105,11 @@ Apply as 2D rotation matrix around crop center (existing pattern).
 
 ### Aspect Ratio Handling
 
-When `quarterTurns` is odd (1 or 3), width and height are swapped. The renderer (CPU-side) computes the effective aspect ratio before passing it to the shader, adjusting:
+When `quarterTurns` is odd (1 or 3), width and height are swapped. Specific call sites that need changes:
 
-- Canvas/FBO sizing accounts for swapped dimensions
-- Crop rect coordinates are interpreted against swapped source dimensions
-- The geometry shader's UV scaling compensates for the aspect change
+- **`WebGLRenderer.ts`**: Add a helper `getEffectiveDims()` that returns `{w: fullHeight, h: fullWidth}` when `quarterTurns` is odd, otherwise `{w: fullWidth, h: fullHeight}`. Use this when sizing preview/export FBOs and computing aspect ratios.
+- **`CanvasViewport.tsx`**: `fitCanvas()` currently uses `imageDims.w / imageDims.h` — must read effective (possibly swapped) dimensions from the renderer or editStore params.
+- **Geometry shader**: UV scaling must account for the source texture having a different aspect than the output when `quarterTurns` is odd — apply aspect correction in the vertex shader before rotation.
 
 ### Crop Mode Interaction
 
@@ -118,7 +119,7 @@ When `quarterTurns` is odd (1 or 3), width and height are swapped. The renderer 
 
 ## Export & Persistence
 
-- **OPFS**: `quarterTurns` serialized as part of `CropRect` in `params.json`. Missing field defaults to 0 for backward compatibility.
+- **OPFS**: `quarterTurns` serialized as part of `CropRect` in `params.json`. Backward compatibility handled in `editStore.loadParams()` via `?? 0` defaulting (see Data Model section).
 - **Full-res export**: Same geometry pass runs at full resolution — rotation uniforms apply identically.
 - **Undo/redo**: No changes needed. Existing snapshot system captures full `EditParams` including `crop.quarterTurns`.
 
@@ -133,7 +134,7 @@ When `quarterTurns` is odd (1 or 3), width and height are swapped. The renderer 
 - `src/components/edit/AdjustmentPanel.tsx` — Add rotation controls (buttons, slider+input, straighten button)
 - `src/components/edit/CanvasViewport.tsx` — Handle swapped dimensions for odd quarterTurns
 - `src/components/edit/CropOverlay.tsx` — Account for rotation when rendering overlay
-- `src/lib/constants.ts` — Add rotation slider config
+- `src/lib/constants.ts` — Add rotation range constants (note: cannot use `SliderConfig` type since `crop.angle` is not a top-level `EditParams` key)
 
 ### Create
 - `src/components/edit/StraightenOverlay.tsx` — Line-drawing overlay with apply/cancel
