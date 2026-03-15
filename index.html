@@ -5,14 +5,6 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Raw Dog</title>
-    <script>
-      // Deregister any previously installed coi-serviceworker
-      if (navigator.serviceWorker) {
-        navigator.serviceWorker.getRegistrations().then(function(regs) {
-          regs.forEach(function(r) { r.unregister(); });
-        });
-      }
-    </script>
   </head>
   <body>
     <div id="root"></div>
