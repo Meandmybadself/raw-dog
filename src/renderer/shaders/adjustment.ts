@@ -58,15 +58,17 @@ vec3 linearToSRGBv(vec3 c) {
   return vec3(linearToSRGB(c.r), linearToSRGB(c.g), linearToSRGB(c.b));
 }
 
-// Luminance-preserving color adjustment (from Photopea's approach).
-// When brightening, blend toward white to avoid oversaturation.
+// Luminance-preserving color adjustment.
+// When brightening, blend toward white to avoid clipping saturated channels.
 // When darkening, scale proportionally to preserve hue.
 vec3 adjustLuminance(vec3 c, float oldLum, float newLum) {
   if (oldLum < 0.0001) return vec3(newLum);
   if (newLum > oldLum) {
-    // Brightening: blend toward white (prevents oversaturation)
-    float denom = max(1.0 - newLum, 0.001);
-    return c + (oldLum - newLum) / denom * (vec3(1.0) - c);
+    // Brightening: interpolate toward white by the ratio of luminance increase
+    // to available headroom. This lifts all channels while preventing oversaturation.
+    float headroom = max(1.0 - oldLum, 0.001);
+    float t = (newLum - oldLum) / headroom;
+    return c + t * (vec3(1.0) - c);
   } else {
     // Darkening: scale proportionally (preserves hue)
     return c * (newLum / oldLum);
