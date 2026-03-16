@@ -4,6 +4,42 @@
   flex-direction: column;
 }
 
+.mobile-notice {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-notice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 48px var(--spacing-lg);
+    gap: var(--spacing-sm);
+    height: 100%;
+  }
+
+  .mobile-notice h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  .mobile-notice p {
+    font-size: var(--font-size-md);
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    margin: 0;
+    max-width: 360px;
+  }
+
+  .app-shell > *:not(.mobile-notice) {
+    display: none;
+  }
+}
+
 .error-toast {
   position: fixed;
   bottom: var(--spacing-lg);

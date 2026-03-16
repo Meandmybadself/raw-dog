@@ -24,6 +24,11 @@ export function App() {
 
   return (
     <div className="app-shell">
+      <div className="mobile-notice">
+        <h1>Rawesome</h1>
+        <p>Rawesome is a desktop browser application and isn't currently available on mobile devices.</p>
+        <p>Please visit on a desktop computer to edit your RAW photos.</p>
+      </div>
       <Topbar />
       {view === 'library' ? <LibraryView /> : <EditView />}
       {error && (
