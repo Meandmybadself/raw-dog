@@ -13,8 +13,39 @@ export function ThumbnailGrid({ entries, onOpen, onDelete }: ThumbnailGridProps)
   if (entries.length === 0) {
     return (
       <div className="thumbnail-grid__empty">
-        <p>No RAW files imported yet.</p>
-        <p>Drag and drop files or click Import to get started.</p>
+        <div className="thumbnail-grid__hero">
+          <h1 className="thumbnail-grid__title">Raw Dog</h1>
+          <p className="thumbnail-grid__tagline">
+            A browser-based RAW photo editor. No uploads, no accounts, no server — your photos never leave your machine.
+          </p>
+        </div>
+
+        <div className="thumbnail-grid__features">
+          <div className="thumbnail-grid__feature">
+            <span className="thumbnail-grid__feature-icon">&#x1f4f7;</span>
+            <h3>RAW Format Support</h3>
+            <p>CR2, NEF, ARW, DNG, RAF, ORF, and more. Open files straight from your camera.</p>
+          </div>
+          <div className="thumbnail-grid__feature">
+            <span className="thumbnail-grid__feature-icon">&#x1f3a8;</span>
+            <h3>Non-Destructive Editing</h3>
+            <p>Exposure, white balance, contrast, clarity, HSL, crop, and film simulations — with full undo/redo.</p>
+          </div>
+          <div className="thumbnail-grid__feature">
+            <span className="thumbnail-grid__feature-icon">&#x26a1;</span>
+            <h3>GPU-Accelerated</h3>
+            <p>Real-time WebGL2 rendering pipeline. Adjustments update instantly, even on large files.</p>
+          </div>
+          <div className="thumbnail-grid__feature">
+            <span className="thumbnail-grid__feature-icon">&#x1f512;</span>
+            <h3>Completely Private</h3>
+            <p>Everything runs client-side. Files are stored in your browser — nothing is sent anywhere.</p>
+          </div>
+        </div>
+
+        <p className="thumbnail-grid__cta">
+          Drag and drop RAW files or click <strong>Import RAW Files</strong> to get started.
+        </p>
       </div>
     )
   }
